@@ -465,7 +465,6 @@ export function ArtifactCatalog() {
   const [activeCategory, setActiveCategory] = useState<CategoryType>("todos");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Lógica de Filtragem (Texto + Categoria)
   const filteredArtifacts = ARTIFACTS.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === "todos" || item.category === activeCategory;
@@ -473,7 +472,9 @@ export function ArtifactCatalog() {
   });
 
   return (
-    <div className="w-full max-w-[95%] mx-auto pb-20 relative z-10">
+    // CORREÇÃO: w-full no mobile (para ocupar tudo) + px-4 (para dar margem igual dos dois lados)
+    // No Desktop (md), ele volta a usar o max-w-[95%]
+    <div className="w-full md:max-w-[95%] mx-auto pb-20 relative z-10 px-4 md:px-0">
       
       {/* MODAL DE ZOOM */}
       {selectedImage && (
@@ -490,22 +491,22 @@ export function ArtifactCatalog() {
         </div>
       )}
 
-      {/* --- CABEÇALHO DA SEÇÃO --- */}
-      <div className="flex flex-col items-center justify-center mb-12 px-4">
+      {/* --- CABEÇALHO --- */}
+      <div className="flex flex-col items-center justify-center mb-8 md:mb-12">
         
         {/* TÍTULO */}
-        <div className="relative py-6 mb-4 flex items-center justify-center overflow-hidden">
+        <div className="relative py-4 md:py-6 mb-4 flex items-center justify-center overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-full bg-radial-gradient(ellipse_at_center,_rgba(255,215,0,0.15)_0%,_transparent_70%) blur-xl pointer-events-none"></div>
-          <h3 className="relative z-10 font-cinzel font-bold text-2xl md:text-3xl text-akashic-gold uppercase tracking-[0.2em] text-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+          <h3 className="relative z-10 font-cinzel font-bold text-xl md:text-3xl text-akashic-gold uppercase tracking-[0.2em] text-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             Arsenal Místico
           </h3>
         </div>
 
         {/* --- BOTÕES DE CATEGORIA --- */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-8 w-full max-w-3xl">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-6 w-full max-w-3xl">
           {[
-            { id: "todos", label: "Ver Tudo", icon: <FaSearch className="mb-1" /> },
-            { id: "decoracao", label: "Decoração", icon: <FaMagic className="mb-1" /> },
+            { id: "todos", label: "Tudo", icon: <FaSearch className="mb-1" /> },
+            { id: "decoracao", label: "Decor", icon: <FaMagic className="mb-1" /> },
             { id: "estatuas", label: "Estátuas", icon: <FaLandmark className="mb-1" /> },
             { id: "amuletos", label: "Amuletos", icon: <FaRing className="mb-1" /> },
           ].map((cat) => (
@@ -514,15 +515,15 @@ export function ArtifactCatalog() {
               onClick={() => setActiveCategory(cat.id as CategoryType)}
               className={`
                 flex flex-col items-center justify-center
-                px-4 py-2 rounded min-w-[100px]
-                border transition-all duration-300 font-cinzel text-xs md:text-sm uppercase tracking-wider
+                px-2 py-2 rounded min-w-[70px] md:min-w-[80px]
+                border transition-all duration-300 font-cinzel text-[10px] md:text-sm uppercase tracking-wider
                 ${activeCategory === cat.id 
                   ? "bg-akashic-gold text-black border-akashic-gold shadow-[0_0_15px_rgba(255,215,0,0.4)] font-bold scale-105" 
                   : "bg-black/40 text-stone-400 border-stone-700 hover:border-akashic-gold hover:text-akashic-gold"
                 }
               `}
             >
-              <span className="text-lg opacity-80">{cat.icon}</span>
+              <span className="text-sm md:text-base opacity-80">{cat.icon}</span>
               <span>{cat.label}</span>
             </button>
           ))}
@@ -531,22 +532,23 @@ export function ArtifactCatalog() {
         {/* BARRA DE BUSCA */}
         <div className="relative w-full max-w-md group">
           <div className="absolute inset-0 bg-akashic-gold/10 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative flex items-center bg-black/80 border border-stone-600 rounded-full px-5 py-2 shadow-inner focus-within:border-akashic-gold transition-all duration-300">
-            <FaSearch className="text-stone-500 w-4 h-4 mr-3 group-focus-within:text-akashic-gold transition-colors" />
+          <div className="relative flex items-center bg-black/80 border border-stone-600 rounded-full px-4 py-1.5 md:px-5 md:py-2 shadow-inner focus-within:border-akashic-gold transition-all duration-300">
+            <FaSearch className="text-stone-500 w-3 h-3 md:w-4 md:h-4 mr-3 group-focus-within:text-akashic-gold transition-colors" />
             <input 
               type="text" 
-              placeholder="Buscar pelo nome..." 
+              placeholder="Buscar..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border-none outline-none text-stone-200 placeholder-stone-600 font-cinzel text-base"
+              className="w-full bg-transparent border-none outline-none text-stone-200 placeholder-stone-600 font-cinzel text-xs md:text-base"
             />
           </div>
         </div>
       </div>
 
       {/* --- GRID DE ARTEFATOS --- */}
+      {/* grid-cols-2 garante 2 itens por linha no celular */}
       {filteredArtifacts.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 animate-fadeIn">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 animate-fadeIn">
           {filteredArtifacts.map((item) => (
             <div
               key={item.id}
@@ -560,49 +562,43 @@ export function ArtifactCatalog() {
                 h-full
               "
             >
-              {/* ÁREA DA IMAGEM (Fundo Branco para destacar o produto) */}
+              {/* ÁREA DA IMAGEM */}
               <div 
-                className="relative w-full aspect-square bg-white flex items-center justify-center cursor-zoom-in overflow-hidden p-4"
+                className="relative w-full aspect-square bg-white flex items-center justify-center cursor-zoom-in overflow-hidden p-2 md:p-4"
                 onClick={() => item.imageSrc && setSelectedImage(item.imageSrc)}
               >
                 <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                   {item.imageSrc ? (
                     <Image src={item.imageSrc} alt={item.title} fill className="object-contain drop-shadow-md" />
                   ) : (
-                    <div className="flex flex-col items-center justify-center w-full h-full text-gray-300 font-cinzel text-xs text-center opacity-60 gap-2">
-                       <FaGem className="text-2xl" />
-                       <span>[Imagem Pendente]</span>
+                    <div className="flex flex-col items-center justify-center w-full h-full text-gray-300 font-cinzel text-[10px] text-center opacity-60 gap-1">
+                       <FaGem className="text-xl" />
+                       <span>[Foto]</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* CONTEÚDO */}
-              <div className="flex-1 flex flex-col justify-between p-4 gap-3 bg-stone-950 border-t border-stone-800">
+              <div className="flex-1 flex flex-col justify-between p-2 md:p-4 gap-2 bg-stone-950 border-t border-stone-800">
                 
-                <span className="font-cinzel font-bold text-center text-stone-200 text-xs md:text-sm group-hover:text-akashic-gold transition-colors duration-300 leading-tight line-clamp-3">
+                {/* Título pequeno no mobile (text-[10px]) */}
+                <span className="font-cinzel font-bold text-center text-stone-200 text-[10px] md:text-sm group-hover:text-akashic-gold transition-colors duration-300 leading-tight line-clamp-3">
                   {item.title}
                 </span>
 
-                {/* BOTÃO COM HOVER NEON AZUL */}
-                <Link href={item.amazonLink} target="_blank" className="w-full mt-2">
+                <Link href={item.amazonLink} target="_blank" className="w-full">
                   <button className="
-                    w-full py-2
+                    w-full py-1.5 md:py-2
                     bg-akashic-gold/10 border border-akashic-gold/50 
-                    text-akashic-gold font-cinzel font-bold text-[10px] uppercase tracking-wider 
+                    text-akashic-gold font-cinzel font-bold text-[9px] md:text-[10px] uppercase tracking-wider 
                     rounded-sm
                     transition-all duration-300 
-                    
-                    /* EFEITO NEON AZUL */
-                    hover:bg-cyan-950/60
-                    hover:border-cyan-400
-                    hover:text-cyan-400
-                    hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]
-                    
+                    hover:bg-cyan-950/60 hover:border-cyan-400 hover:text-cyan-400 hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]
                     active:scale-95 
                     flex items-center justify-center gap-1
                   ">
-                    <span>Obter</span> <span className="text-[10px]">↗</span>
+                    <span>Obter</span> <span className="text-[9px]">↗</span>
                   </button>
                 </Link>
               </div>
@@ -612,7 +608,7 @@ export function ArtifactCatalog() {
       ) : (
         <div className="text-center py-20 bg-black/20 rounded-lg border border-dashed border-stone-800">
           <FaGem className="w-12 h-12 text-stone-600 mx-auto mb-4" />
-          <p className="font-cinzel text-stone-500 text-xl">Nenhum artefato encontrado nesta categoria.</p>
+          <p className="font-cinzel text-stone-500 text-xl">Nada encontrado.</p>
           <button 
             onClick={() => {setActiveCategory('todos'); setSearchTerm('');}}
             className="mt-4 text-akashic-gold underline text-sm hover:text-white"

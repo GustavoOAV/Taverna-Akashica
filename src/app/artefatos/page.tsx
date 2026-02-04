@@ -1,11 +1,12 @@
-import { ArtifactCatalog } from "@/components/artifacts/ArtifactCatalog"; // Componente Novo
+import { ArtifactCatalog } from "@/components/artifacts/ArtifactCatalog";
 import { Footer } from "@/components/layout/Footer";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function ArtefatosPage() {
   return (
-    <div className="min-h-screen flex flex-col relative bg-akashic-stone">
+    // AQUI: Adicionei 'overflow-x-hidden' para travar o scroll lateral indesejado
+    <div className="min-h-screen flex flex-col relative bg-akashic-stone overflow-x-hidden">
       
       {/* 1. O FUNDO ABSOLUTO (A Parede Fixa) */}
       <div 
