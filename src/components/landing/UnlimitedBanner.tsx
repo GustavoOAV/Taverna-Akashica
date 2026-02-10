@@ -21,11 +21,6 @@ export function UnlimitedBanner() {
         <Image
           src="/images/card-unlimited.png" 
           alt="Torne-se o Guardião dos Registros - Kindle Unlimited"
-          /* TRUQUE VISUAL:
-             O banner de cima tem width={900}.
-             Colocamos este com width={800} para ele ficar sutilmente menor,
-             criando uma 'pirâmide invertida' visualmente agradável.
-          */
           width={500}
           height={150}
           className="rounded-lg opacity-90 hover:opacity-100 transition-opacity"

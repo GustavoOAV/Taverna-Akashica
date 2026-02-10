@@ -2,768 +2,208 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { FaBookOpen, FaSearch } from "react-icons/fa"; // Ícone de Lupa
+import { useMemo, useState } from "react";
+import { FaBookOpen, FaCrown, FaEye, FaHourglassHalf, FaSearch } from "react-icons/fa";
 
-// Type definitions for category and language filters
-type CategoryType = "todos" | "historia" | "eras" | "sabedoria";
-type LanguageType = "todos" | "pt" | "en";
+// IMPORTAÇÃO DOS DADOS DOS LIVROS 
+import { BOOKS, type Book, type CategoryType, type LanguageType } from "./bookData";
 
-// --- LISTA COMPLETA DE LIVROS ---
-// Cole os links das imagens da Amazon no campo "imageSrc"
-const BOOKS = [
- {
-    id: "b1",
-    title: "Lost Civilization of Thonis-Heracleion",
-    imageSrc: "https://m.media-amazon.com/images/I/8178WtVLqrL._SL1499_.jpg", 
-    amazonLink: "https://amzn.to/45Hgg0w",
-    category: "eras",    // Civilização Perdida = Eras Esquecidas
-    language: "en",      // Inglês
-  },
-  {
-    id: "b2",
-    title: "O 12º Planeta: Livro 1 das Crônicas da Terra",
-    imageSrc: "https://m.media-amazon.com/images/I/51HxcfkinoL._SL1000_.jpg", 
-    amazonLink: "https://amzn.to/49pLonI",
-    category: "eras",    // História Antiga/Anunnaki
-    language: "pt",
-  },
-  {
-    id: "b3",
-    title: "O Livro De Enoque",
-    imageSrc: "https://m.media-amazon.com/images/I/61Jux50srZL._SL1200_.jpg",
-    amazonLink: "https://amzn.to/45XizN0",
-    category: "sabedoria", // Texto Sagrado/Oculto
-    language: "pt",
-  },
-  {
-    id: "b4",
-    title: "O Livro perdido de Enki",
-    imageSrc: "https://m.media-amazon.com/images/I/61N2e5+P5sL._SL1410_.jpg",
-    amazonLink: "https://amzn.to/4jHoED9",
-    category: "eras",    // História Antiga
-    language: "pt",
-  },
-  {
-    id: "b5",
-    title: "Expansão da Consciência",
-    imageSrc: "https://m.media-amazon.com/images/I/717Cyb4lSTL._SL1180_.jpg",
-    amazonLink: "https://amzn.to/4jFkATK",
-    category: "sabedoria", // Espiritualidade
-    language: "pt",
-  },
-  {
-    id: "b6",
-    title: "Os Deuses Eram Astronautas",
-    imageSrc: "https://m.media-amazon.com/images/I/91nclYk3PyL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qipCYQ",
-    category: "eras",    // História Alternativa
-    language: "pt",
-  },
-  {
-    id: "b7",
-    title: "A Conexão Anunnaki",
-    imageSrc: "https://m.media-amazon.com/images/I/61hMzHsnwjL.jpg",
-    amazonLink: "https://amzn.to/4b7CdcR",
-    category: "eras",    // História Antiga
-    language: "pt",
-  },
-  {
-    id: "b9",
-    title: "O rei que se Recusava a Morrer",
-    imageSrc: "https://m.media-amazon.com/images/I/61UU5zl+1cL._SL1000_.jpg",
-    amazonLink: "https://amzn.to/49X8qSU",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b10",
-    title: "O Caminho Para o Céu",
-    imageSrc: "https://m.media-amazon.com/images/I/61oTVphoBRL._SY342_.jpg",
-    amazonLink: "https://amzn.to/4sNeRQ4",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b11",
-    title: "Atlântida e Outros Mundos Perdidos",
-    imageSrc: "https://m.media-amazon.com/images/I/71r-z5ZC-gL._SL1280_.jpg",
-    amazonLink: "https://amzn.to/4sJ5pgo",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b12",
-    title: "A biblioteca de Nag Hammadi",
-    imageSrc: "https://m.media-amazon.com/images/I/71ndXZ9DkIL._SL1018_.jpg",
-    amazonLink: "https://amzn.to/4jOgby8",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b13",
-    title: "Conectando-se com os Arcturianos",
-    imageSrc: "https://m.media-amazon.com/images/I/71aQeuJoX6L._SL1410_.jpg",
-    amazonLink: "https://amzn.to/4pMXOLb",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b14",
-    title: "Fim dos Tempos",
-    imageSrc: "https://m.media-amazon.com/images/I/61SnU1Rl26L._SL1000_.jpg",
-    amazonLink: "https://amzn.to/3YHoHFo",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b15",
-    title: "O Grande Livro dos Mistérios Antigos",
-    imageSrc: "https://m.media-amazon.com/images/I/91hNEdsd+1L._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4aYbjUF",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b16",
-    title: "Coleção Apócrifos E Pseudo-Epígrafos",
-    imageSrc: "https://m.media-amazon.com/images/I/61jlBRA4+EL._SL1000_.jpg",
-    amazonLink: "https://amzn.to/3LCiK9J",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b17",
-    title: "Os 3 livros de Enoque, Jubileus...",
-    imageSrc: "https://m.media-amazon.com/images/I/61Dod0CzRtL._SL1413_.jpg",
-    amazonLink: "https://amzn.to/4b1Wm3W",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b18",
-    title: "Mistérios da Arqueologia e da História",
-    imageSrc: "https://m.media-amazon.com/images/I/91-vpCeeqRL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3ZkRyiN",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b19",
-    title: "Edda em Prosa",
-    imageSrc: "https://m.media-amazon.com/images/I/61aBxyfMKKL._SL1200_.jpg",
-    amazonLink: "https://amzn.to/3YHO9uf",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b20",
-    title: "Edda Poética",
-    imageSrc: "https://m.media-amazon.com/images/I/51nx4eiZWHL._SL1200_.jpg",
-    amazonLink: "https://amzn.to/4qhRWuq",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b21",
-    title: "Box Mitologia Nórdica",
-    imageSrc: "https://m.media-amazon.com/images/I/61oMAgkArnL._SL1000_.jpg",
-    amazonLink: "https://amzn.to/4sJqXJI",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b22",
-    title: "Os mitos gregos: Box",
-    imageSrc: "https://m.media-amazon.com/images/I/91wfQhlWyeL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49DbDG5",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b23",
-    title: "Vikings: A história definitiva",
-    imageSrc: "https://m.media-amazon.com/images/I/9100SB6e4OL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4byzWav",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b24",
-    title: "Box O grande livro da Mitologia",
-    imageSrc: "https://m.media-amazon.com/images/I/81S3SsjJvkL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qQFKk5",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b25",
-    title: "O Decamerão - Box",
-    imageSrc: "https://m.media-amazon.com/images/I/71hSo95trmL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qTeTUB",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b26",
-    title: "Grandes obras de Shakespeare - Box",
-    imageSrc: "https://m.media-amazon.com/images/I/91tEwkZRenL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49Co4Sn",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b27",
-    title: "Mitologia: As melhores histórias",
-    imageSrc: "https://m.media-amazon.com/images/I/81MX4J74ZaL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4pKLNWL",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b28",
-    title: "O Livro das Chaves: Lemegeton",
-    imageSrc: "https://m.media-amazon.com/images/I/61SAOBWKaNL.jpg",
-    amazonLink: "https://amzn.to/3NNUVfC",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b29",
-    title: "Babilônia: O nascimento da civilização",
-    imageSrc: "https://m.media-amazon.com/images/I/91kFpY5JJ1L._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3NnDxOT",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b30",
-    title: "Tesla: A vida e a loucura",
-    imageSrc: "https://m.media-amazon.com/images/I/71h3KzsvsDL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49T1bLP",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b31",
-    title: "A Grande Obra da Alquimia",
-    imageSrc: "https://m.media-amazon.com/images/I/517F+fZESPL._SL1200_.jpg",
-    amazonLink: "https://amzn.to/4jI6HEp",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b32",
-    title: "Mito de Deucalião e Pirra",
-    imageSrc: "https://m.media-amazon.com/images/I/71cQupccafL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3YHKzQQ",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b33",
-    title: "Os Illuminati",
-    imageSrc: "https://m.media-amazon.com/images/I/310BRuyWFOL.jpg",
-    amazonLink: "https://amzn.to/4qWxn6S",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b34",
-    title: "Os sete selos de Apocalipse",
-    imageSrc: "https://m.media-amazon.com/images/I/71CnsO0sKYL._SL1000_.jpg",
-    amazonLink: "https://amzn.to/3Zf0CWt",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b35",
-    title: "BÍBLIA JFA 1819 STANDARD",
-    imageSrc: "https://m.media-amazon.com/images/I/61x17iOJWZL._SL1080_.jpg",
-    amazonLink: "https://amzn.to/4sFAotI",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b36",
-    title: "Os deuses dos Himalaias",
-    imageSrc: "https://m.media-amazon.com/images/I/91VKBMUCPgL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4sNh9Pa",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b37",
-    title: "A Biblioteca de Alexandria",
-    imageSrc: "https://m.media-amazon.com/images/I/914fUgTQvHL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3Nt4FMf",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b38",
-    title: "Viracocha: Inca’s Creator God",
-    imageSrc: "https://m.media-amazon.com/images/I/61ldsDAtL5L._SL1294_.jpg",
-    amazonLink: "https://amzn.to/4qjaZ7H",
-    category: "eras",
-    language: "en",
-  },
-  {
-    id: "b39",
-    title: "Agememnon",
-    imageSrc: "https://m.media-amazon.com/images/I/41oFuoYtbFL.jpg",
-    amazonLink: "https://amzn.to/3NppdW0",
-    category: "eras",
-    language: "en",
-  },
-  {
-    id: "b40",
-    title: "Itinerários da loucura Dogon",
-    imageSrc: "https://m.media-amazon.com/images/I/81f4y5kJgoL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4bBq145",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b41",
-    title: "Sacred Symbols of the Dogon",
-    imageSrc: "https://m.media-amazon.com/images/I/81CfrDT3aRL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49XscO7",
-    category: "sabedoria",
-    language: "en",
-  },
-  {
-    id: "b42",
-    title: "GRIMÓRIO SAGRADO DE SÃO BENTO",
-    imageSrc: "https://m.media-amazon.com/images/I/819RAEsXyML._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qrUrum",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b43",
-    title: "O Manuscrito Voynich",
-    imageSrc: "https://m.media-amazon.com/images/I/81Ro2gdTjoL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qstUgv",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b44",
-    title: "Novo Bestiário Goeta",
-    imageSrc: "https://m.media-amazon.com/images/I/71+5Nj1Gh8L._SL1280_.jpg",
-    amazonLink: "https://amzn.to/4qvtRAC",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b45",
-    title: "As digitais dos deuses",
-    imageSrc: "https://m.media-amazon.com/images/I/61H6Nk-8JTL._SL1300_.jpg",
-    amazonLink: "https://amzn.to/4pIPA6P",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b46",
-    title: "O Caibalion",
-    imageSrc: "https://m.media-amazon.com/images/I/71Qtk4zH3-L._SL1360_.jpg",
-    amazonLink: "https://amzn.to/4qTgwlb",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b47",
-    title: "História Secreta Da Raça Humana",
-    imageSrc: "https://m.media-amazon.com/images/I/71CDIRthhBL._SL1156_.jpg",
-    amazonLink: "https://amzn.to/4qNfGGw",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b48",
-    title: "Mistério de Sirius",
-    imageSrc: "https://m.media-amazon.com/images/I/51XeyaOywzL._SL1000_.jpg",
-    amazonLink: "https://amzn.to/4qis4P2",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b49",
-    title: "The Sirius Mystery",
-    imageSrc: "https://m.media-amazon.com/images/I/71pPgLyuifL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3ZdTsSj",
-    category: "sabedoria",
-    language: "en",
-  },
-  {
-    id: "b50",
-    title: "A Doutrina Secreta: Vol 1",
-    imageSrc: "https://m.media-amazon.com/images/I/91274z-+gWL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/45cJVys",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b51",
-    title: "A Doutrina Secreta: Vol 2",
-    imageSrc: "https://m.media-amazon.com/images/I/81Mb9m9pMuL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3LJgQ7f",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b52",
-    title: "A Doutrina Secreta: Vol 3",
-    imageSrc: "https://m.media-amazon.com/images/I/91aAJ9bFmXL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qNJUcG",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b53",
-    title: "A Doutrina Secreta: Vol 4",
-    imageSrc: "https://m.media-amazon.com/images/I/91MXpsCfTwL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4qkYZm1",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b54",
-    title: "A Doutrina Secreta: Vol 5",
-    imageSrc: "https://m.media-amazon.com/images/I/81SHtSk7nuL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/45darrB",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b55",
-    title: "A Doutrina Secreta: Vol 6",
-    imageSrc: "https://m.media-amazon.com/images/I/91ebaN1STlL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3NlnVLM",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b56",
-    title: "Numerologia: O Código Revelado",
-    imageSrc: "https://m.media-amazon.com/images/I/91nbuYUm6PL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49ruGEw",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b57",
-    title: "Direitos da Natureza",
-    imageSrc: "https://m.media-amazon.com/images/I/81D8GGy2hkL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4bCl7DT",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b58",
-    title: "O LEGADO DE THOT: Eneagrama",
-    imageSrc: "",
-    amazonLink: "https://amzn.to/4sE2lSV",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b59",
-    title: "Os Mistérios Do Universo",
-    imageSrc: "https://m.media-amazon.com/images/I/51OrbZ8kHfL.jpg",
-    amazonLink: "https://mercadolivre.com/sec/32i76hZ",
-    category: "eras",
-    language: "pt",
-  },
-  {
-    id: "b60",
-    title: "Grimório das Bruxas",
-    imageSrc: "https://m.media-amazon.com/images/I/91sXeImEBnL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4pFNzrQ",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b61",
-    title: "Grimório Aprendiz de Feiticeiro",
-    imageSrc: "https://m.media-amazon.com/images/I/71Evk2BPjsL._SL1434_.jpg",
-    amazonLink: "https://amzn.to/3NMVpmf",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b62",
-    title: "Grimório Oculto",
-    imageSrc: "https://m.media-amazon.com/images/I/81qxT1hKt0L._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3Z1mK6V",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b63",
-    title: "O Grimório da Magia Natural",
-    imageSrc: "https://m.media-amazon.com/images/I/719uNJ4ev9L._SL1007_.jpg",
-    amazonLink: "https://amzn.to/49rcPxi",
-    category: "sabedoria",
-    language: "pt",
-  },
-  {
-    id: "b64",
-    title: "Gêngis Khan",
-    imageSrc: "https://m.media-amazon.com/images/I/71bto20jVaL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3MefL7z",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b65",
-    title: "Alexandre, o Grande",
-    imageSrc: "https://m.media-amazon.com/images/I/81PShtIMTSL._SL1296_.jpg",
-    amazonLink: "https://amzn.to/4keJdXD",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b66",
-    title: "Catarina, a grande: Retrato de uma mulher",
-    imageSrc: "https://m.media-amazon.com/images/I/61inV5uyNOL._SL1358_.jpg",
-    amazonLink: "https://amzn.to/3ZBwODX",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b67",
-    title: "As viagens: Marco Polo",
-    imageSrc: "https://m.media-amazon.com/images/I/81KljvyheXL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4kf2mZL",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b68",
-    title: "Nero e seus herdeiros",
-    imageSrc: "https://m.media-amazon.com/images/I/81MpK3TN3KL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/4bzSY0v",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b69",
-    title: "Pedro, o Grande: Sua vida e seu mundo",
-    imageSrc: "https://m.media-amazon.com/images/I/91cl3NkhYTL._SL1500_.jpg",
-    amazonLink: "https://amzn.to/3ZOuWaH",
-    category: "historia",
-    language: "pt",
-  },
-  {
-    id: "b70",
-    title: "Babili: A libertação do povo judeu",
-    imageSrc: "https://m.media-amazon.com/images/I/91v4bgjD+-L._SL1500_.jpg",
-    amazonLink: "https://amzn.to/49Y0dy3",
-    category: "historia",
-    language: "pt",
-  },
-  
-  
-];
+// --- SUB-COMPONENTES (MANTENHA ELES AQUI) ---
 
+// 1. Botão de Categoria
+const CategoryButton = ({ 
+  id, label, icon, isActive, onClick 
+}: { 
+  id: CategoryType | "todos"; // Ajuste leve de tipo
+  label: string; 
+  icon: React.ReactNode; 
+  isActive: boolean; 
+  onClick: (id: CategoryType | "todos") => void;
+}) => (
+  <button
+    onClick={() => onClick(id)}
+    className={`
+      flex flex-col items-center justify-center
+      w-[85px] h-[60px] md:w-[110px] md:h-[80px]
+      rounded border transition-all duration-300 font-cinzel text-[10px] md:text-sm uppercase tracking-wider
+      ${isActive 
+        ? "bg-cyan-400 text-black border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.6)] font-bold scale-105" 
+        : "bg-black/40 text-stone-400 border-stone-700 hover:border-cyan-400 hover:text-cyan-400"
+      }
+    `}
+  >
+    <span className="text-sm md:text-base opacity-80">{icon}</span>
+    <span>{label}</span>
+  </button>
+);
+
+// 2. Card do Livro
+const BookCard = ({ book, onZoom }: { book: Book; onZoom: (src: string) => void }) => (
+  <div className="flex flex-col bg-black/40 border border-stone-800 hover:border-akashic-gold rounded-lg transition-all duration-300 group hover:shadow-[0_0_25px_rgba(255,215,0,0.1)] overflow-hidden h-full">
+    
+    <div 
+      className="relative w-full aspect-[2/3] bg-white flex items-center justify-center cursor-zoom-in overflow-hidden p-4"
+      onClick={() => book.imageSrc && onZoom(book.imageSrc)}
+    >
+      <div className={`absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-bold rounded border bg-white/90 shadow-sm z-10 ${book.language === 'en' ? 'text-blue-700 border-blue-200' : 'text-green-700 border-green-200'}`}>
+        {book.language === 'en' ? 'EN' : 'PT'}
+      </div>
+
+      <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
+        {book.imageSrc ? (
+          <Image src={book.imageSrc} alt={book.title} fill className="object-contain drop-shadow-md" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full text-gray-300 font-cinzel text-xs text-center">[Capa Pendente]</div>
+        )}
+      </div>
+    </div>
+
+    <div className="flex-1 flex flex-col justify-between p-2 md:p-4 gap-2 bg-stone-950 border-t border-stone-800">
+      <span className="flex-1 flex items-center justify-center font-cinzel font-bold text-center text-stone-300 text-[10px] md:text-sm group-hover:text-akashic-gold transition-colors duration-300 leading-tight line-clamp-3">
+        {book.title}
+      </span>
+      
+      <Link href={book.amazonLink} target="_blank" className="w-full">
+        <button className="
+          w-full py-1.5 md:py-2
+          bg-akashic-gold/10 border border-akashic-gold/50 
+          text-akashic-gold font-cinzel font-bold text-[9px] md:text-[10px] uppercase tracking-wider 
+          rounded-sm transition-all duration-300 
+          hover:bg-cyan-950/60 hover:border-cyan-400 hover:text-cyan-400 hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]
+          active:scale-95 flex items-center justify-center gap-1
+        ">
+          <span>Obter</span> <span className="text-[9px]">↗</span>
+        </button>
+      </Link>
+    </div>
+  </div>
+);
+
+// 3. Modal de Zoom
+const ZoomModal = ({ src, onClose }: { src: string; onClose: () => void }) => (
+  <div 
+    className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+    onClick={onClose}
+  >
+    <div className="relative w-full max-w-md h-[70vh] flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full h-full bg-white rounded p-1 shadow-2xl">
+        <Image src={src} alt="Zoom" fill className="object-contain" />
+      </div>
+      <button onClick={onClose} className="absolute -top-12 right-0 text-white text-4xl hover:text-akashic-gold">&times;</button>
+    </div>
+  </div>
+);
+
+
+// --- COMPONENTE PRINCIPAL ---
 export function BookCatalog() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState<CategoryType>("todos");
-  const [activeLanguage, setActiveLanguage] = useState<LanguageType>("todos");
+  const [activeCategory, setActiveCategory] = useState<CategoryType | "todos">("todos");
+  const [activeLanguage, setActiveLanguage] = useState<LanguageType | "todos">("todos");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // --- LÓGICA DE FILTRAGEM ---
-  const filteredBooks = BOOKS.filter((book) => {
-    // 1. Filtro de Texto
-    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // 2. Filtro de Categoria
-    const matchesCategory = activeCategory === "todos" || book.category === activeCategory;
-    
-    // 3. Filtro de Idioma
-    const matchesLanguage = activeLanguage === "todos" || book.language === activeLanguage;
+  // Lógica memorizada (Agora usando o BOOKS importado)
+  const filteredBooks = useMemo(() => {
+    return BOOKS.filter((book) => {
+      const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === "todos" || book.category === activeCategory;
+      const matchesLanguage = activeLanguage === "todos" || book.language === activeLanguage;
+      return matchesSearch && matchesCategory && matchesLanguage;
+    });
+  }, [searchTerm, activeCategory, activeLanguage]);
 
-    return matchesSearch && matchesCategory && matchesLanguage;
-  });
+  const handleClearFilters = () => {
+    setActiveCategory('todos');
+    setActiveLanguage('todos');
+    setSearchTerm('');
+  };
+
+  const categories = [
+    { id: "todos", label: "Tudo", icon: <FaSearch className="mb-1" /> },
+    { id: "historia", label: "História", icon: <FaCrown className="mb-1" /> },
+    { id: "eras", label: "Eras", icon: <FaHourglassHalf className="mb-1" /> },
+    { id: "sabedoria", label: "Oculto", icon: <FaEye className="mb-1" /> },
+  ] as const;
 
   return (
-    <div className="w-full max-w-[95%] mx-auto pb-20 relative z-10">
+    <div className="w-full md:max-w-[95%] mx-auto pb-20 relative z-10 px-4 md:px-0">
       
-      {/* MODAL DE ZOOM */}
-      {selectedImage && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative w-full max-w-md h-[70vh] flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <div className="relative w-full h-full bg-white rounded p-1 shadow-2xl">
-                <Image src={selectedImage} alt="Zoom" fill className="object-contain" />
-            </div>
-            <button onClick={() => setSelectedImage(null)} className="absolute -top-12 right-0 text-white text-4xl hover:text-akashic-gold">&times;</button>
-          </div>
-        </div>
-      )}
+      {selectedImage && <ZoomModal src={selectedImage} onClose={() => setSelectedImage(null)} />}
 
-      {/* --- CABEÇALHO E FILTROS --- */}
-      <div className="flex flex-col items-center justify-center mb-12 px-4">
+      <div className="flex flex-col items-center justify-center mb-8 md:mb-12">
         
-        {/* TÍTULO ESTILIZADO */}
-        <div className="relative py-8 mb-6 flex items-center justify-center overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] md:w-[60%] h-full bg-radial-gradient(ellipse_at_center,_rgba(255,215,0,0.15)_0%,_transparent_70%) blur-xl pointer-events-none z-0"></div>
-          <div className="hidden md:block h-[2px] flex-1 max-w-[100px] bg-gradient-to-r from-transparent via-akashic-gold/50 to-akashic-gold mr-4 opacity-70 relative z-10"></div>
-          <h3 className="relative z-10 font-cinzel font-bold text-2xl md:text-3xl text-akashic-gold uppercase tracking-[0.25em] text-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-            Catálogo Completo
+        <div className="relative py-4 md:py-6 mb-4 flex items-center justify-center overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-full bg-radial-gradient(ellipse_at_center,_rgba(255,215,0,0.15)_0%,_transparent_70%) blur-xl pointer-events-none"></div>
+          <h3 className="relative z-10 font-cinzel font-bold text-xl md:text-3xl text-akashic-gold uppercase tracking-[0.2em] text-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+            Catálogo dos Tomos
           </h3>
-          <div className="hidden md:block h-[2px] flex-1 max-w-[100px] bg-gradient-to-l from-transparent via-akashic-gold/50 to-akashic-gold ml-4 opacity-70 relative z-10"></div>
         </div>
 
-        {/* --- ÁREA DE FILTROS --- */}
-        <div className="w-full max-w-4xl flex flex-col gap-6 mb-8">
-          
-          {/* 1. FILTRO DE TEMA (Botões Grandes) */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {[
-              { id: "todos", label: "Todos os Tomos" },
-              { id: "historia", label: "Figuras Históricas" },
-              { id: "eras", label: "Eras Esquecidas" },
-              { id: "sabedoria", label: "Sabedoria Oculta" },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id as CategoryType)}
-                className={`
-                  px-4 py-2 rounded border transition-all duration-300 font-cinzel text-xs md:text-sm uppercase tracking-wider
-                  ${activeCategory === cat.id 
-                    ? "bg-akashic-gold text-black border-akashic-gold shadow-[0_0_15px_rgba(255,215,0,0.4)] font-bold scale-105" 
-                    : "bg-black/40 text-stone-400 border-stone-700 hover:border-akashic-gold hover:text-akashic-gold"
-                  }
-                `}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-6 w-full max-w-3xl">
+          {categories.map((cat) => (
+            <CategoryButton
+              key={cat.id}
+              id={cat.id}
+              label={cat.label}
+              icon={cat.icon}
+              isActive={activeCategory === cat.id}
+              onClick={setActiveCategory}
+            />
+          ))}
+        </div>
 
-          {/* 2. FILTRO DE IDIOMA E BARRA DE BUSCA */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full">
+        <div className="flex flex-col md:flex-row gap-4 w-full max-w-2xl items-center justify-center">
             
-            {/* Seletor de Idioma */}
-            <div className="flex items-center gap-2 p-1 bg-black/40 border border-stone-700 rounded-lg">
-              <button 
-                onClick={() => setActiveLanguage("todos")}
-                className={`px-3 py-1 rounded text-xs font-cinzel uppercase transition-colors ${activeLanguage === "todos" ? "bg-stone-700 text-white" : "text-stone-500 hover:text-white"}`}
-              >
-                Todos
-              </button>
-              <button 
-                onClick={() => setActiveLanguage("pt")}
-                className={`px-3 py-1 rounded text-xs font-cinzel uppercase transition-colors flex items-center gap-1 ${activeLanguage === "pt" ? "bg-green-900/50 text-green-400 border border-green-800" : "text-stone-500 hover:text-green-400"}`}
-              >
-                PT
-              </button>
-              <button 
-                onClick={() => setActiveLanguage("en")}
-                className={`px-3 py-1 rounded text-xs font-cinzel uppercase transition-colors flex items-center gap-1 ${activeLanguage === "en" ? "bg-blue-900/50 text-blue-400 border border-blue-800" : "text-stone-500 hover:text-blue-400"}`}
-              >
-                EN
-              </button>
+            <div className="flex items-center gap-2 p-1 bg-black/60 border border-stone-700 rounded h-[42px]">
+                {(['todos', 'pt', 'en'] as const).map((lang) => (
+                    <button
+                        key={lang}
+                        onClick={() => setActiveLanguage(lang)}
+                        className={`
+                            px-3 h-full rounded text-[10px] md:text-xs font-cinzel font-bold uppercase transition-all
+                            ${activeLanguage === lang 
+                                ? "bg-stone-700 text-white shadow-inner" 
+                                : "text-stone-500 hover:text-white"
+                            }
+                        `}
+                    >
+                        {lang === 'todos' ? 'Todos' : lang.toUpperCase()}
+                    </button>
+                ))}
             </div>
 
-            {/* Barra de Busca */}
-            <div className="relative flex-1 w-full max-w-md group">
+            <div className="relative flex-1 w-full group">
               <div className="absolute inset-0 bg-akashic-gold/10 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="relative flex items-center bg-black/80 border border-stone-600 rounded-full px-5 py-2 shadow-inner focus-within:border-akashic-gold transition-all duration-300">
-                <FaSearch className="text-stone-500 w-4 h-4 mr-3 group-focus-within:text-akashic-gold transition-colors" />
-                <input 
-                  type="text" 
-                  placeholder="Filtrar por nome..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none text-stone-200 placeholder-stone-600 font-cinzel text-base"
-                />
+              <div className="relative flex items-center bg-black/80 border border-stone-600 rounded px-4 py-2 shadow-inner focus-within:border-akashic-gold transition-all duration-300 h-[42px]">
+                  <FaSearch className="text-stone-500 w-3 h-3 md:w-4 md:h-4 mr-3 group-focus-within:text-akashic-gold transition-colors" />
+                  <input 
+                    type="text" 
+                    placeholder="Buscar livro..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-transparent border-none outline-none text-stone-200 placeholder-stone-600 font-cinzel text-xs md:text-sm"
+                  />
               </div>
             </div>
-
-          </div>
         </div>
       </div>
 
-      {/* --- GRID DE RESULTADOS --- */}
       {filteredBooks.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 animate-fadeIn">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 animate-fadeIn">
           {filteredBooks.map((book) => (
-            <div
-              key={book.id}
-              className="
-                flex flex-col 
-                bg-black/40 
-                border border-stone-800 hover:border-akashic-gold 
-                rounded-lg transition-all duration-300 group
-                hover:shadow-[0_0_25px_rgba(255,215,0,0.1)]
-                overflow-hidden
-                h-full
-              "
-            >
-              {/* ÁREA DA IMAGEM */}
-              <div 
-                className="relative w-full aspect-[2/3] bg-white flex items-center justify-center cursor-zoom-in overflow-hidden p-4"
-                onClick={() => book.imageSrc && setSelectedImage(book.imageSrc)}
-              >
-                {/* Tag de Idioma */}
-                <div className={`absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded border bg-white/90 shadow-sm z-10 ${book.language === 'en' ? 'text-blue-700 border-blue-200' : 'text-green-700 border-green-200'}`}>
-                   {book.language === 'en' ? 'EN' : 'PT'}
-                </div>
-
-                <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
-                  {book.imageSrc ? (
-                    <Image src={book.imageSrc} alt={book.title} fill className="object-contain drop-shadow-md" />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full text-gray-300 font-cinzel text-xs text-center">[Capa Pendente]</div>
-                  )}
-                </div>
-              </div>
-
-              {/* CONTEÚDO */}
-              <div className="flex-1 flex flex-col justify-between p-3 gap-3 bg-stone-950 border-t border-stone-800">
-                <span className="flex-1 flex items-center justify-center font-cinzel font-bold text-center text-stone-300 text-xs md:text-sm group-hover:text-akashic-gold transition-colors duration-300 leading-tight line-clamp-3">
-                  {book.title}
-                </span>
-                
-                {/* BOTÃO COM HOVER NEON AZUL */}
-                <Link href={book.amazonLink} target="_blank" className="w-full">
-                  <button className="
-                    w-full py-2
-                    /* Estado Normal */
-                    bg-akashic-gold/10 border border-akashic-gold/50 
-                    text-akashic-gold font-cinzel font-bold text-[10px] uppercase tracking-wider 
-                    rounded-sm
-                    transition-all duration-300 
-                    
-                    /* --- HOVER AZUL NEON --- */
-                    hover:bg-cyan-950/60
-                    hover:border-cyan-400
-                    hover:text-cyan-400
-                    hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]
-                    
-                    active:scale-95 
-                    flex items-center justify-center gap-1
-                  ">
-                    <span>Obter</span> <span className="text-[10px]">↗</span>
-                  </button>
-                </Link>
-              </div>
-            </div>
+            <BookCard 
+              key={book.id} 
+              book={book} 
+              onZoom={setSelectedImage} 
+            />
           ))}
         </div>
       ) : (
-        /* Estado Vazio */
         <div className="text-center py-20 bg-black/20 rounded-lg border border-dashed border-stone-800">
           <FaBookOpen className="w-12 h-12 text-stone-600 mx-auto mb-4" />
-          <p className="font-cinzel text-stone-500 text-xl">Nenhum registro encontrado com estes filtros.</p>
+          <p className="font-cinzel text-stone-500 text-xl">Nenhum registro encontrado.</p>
           <button 
-            onClick={() => {setActiveCategory('todos'); setActiveLanguage('todos'); setSearchTerm('');}}
+            onClick={handleClearFilters}
             className="mt-4 text-akashic-gold underline text-sm hover:text-white"
           >
             Limpar filtros

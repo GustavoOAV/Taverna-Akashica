@@ -6,22 +6,21 @@ import Image from "next/image";
 
 // Configuração dos Pergaminhos
 const SCROLLS = [
- 
   {
     id: 1,
-    src: "/images/scroll-2.png",
+    src: "/images/banner1.png",
     alt: "A Doutrina dos Mestres",
     link: "/doutrina",
   },
   {
     id: 2,
-    src: "/images/scroll-3.png",
+    src: "/images/banner2.png",
     alt: "Artefatos e Proteção",
     link: "/artefatos",
   },
   {
     id: 3,
-    src: "/images/scroll-4.png",
+    src: "/images/banner3.png",
     alt: "Expansão da Consciência",
     link: "/livros",
   },
@@ -30,6 +29,7 @@ const SCROLLS = [
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-akashic-stone overflow-x-hidden">
+      
       {/* 1. SEÇÃO DO CÉU */}
       <section className="w-full h-[180px] md:h-[400px] bg-[url('/images/bg-stars.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center relative z-20">
         <div className="absolute bottom-0 translate-y-[10%] md:translate-y-[10%] left-1/2 -translate-x-1/2 w-full max-w-[90%] md:max-w-3xl flex justify-center z-30">
@@ -46,11 +46,12 @@ export default function Home() {
 
       {/* 2. SEÇÃO DA PAREDE */}
       <section className="w-full flex-1 bg-[url('/images/bg-wall.png')] bg-cover bg-center border-t-2 border-akashic-gold shadow-[0_-4px_25px_rgba(255,215,0,0.5)] flex flex-col items-center pt-0 md:pt-26 relative z-10 pb-20">
+        
         {/* Banners Principais */}
         <KindleBanner />
         <UnlimitedBanner />
 
-        {/* Divisória Decorativa com Texto Novo */}
+        {/* Divisória Decorativa com Texto */}
         <div className="mt-12 mb-8 flex items-center justify-center gap-3 md:gap-6 opacity-90 w-full px-4">
           {/* Linha Esquerda */}
           <div className="h-[1px] w-8 md:w-16 bg-akashic-gold shadow-[0_0_5px_#ffd700] shrink-0"></div>
@@ -67,13 +68,14 @@ export default function Home() {
         {/* O GRID DE PERGAMINHOS (IMAGENS) */}
         <div
           className="
-          w-full max-w-7xl px-4 
-          grid 
-          grid-cols-2 
-          lg:grid-cols-4 
-          gap-3 md:gap-6 
-          place-items-center
-        "
+            w-full max-w-7xl px-4
+            flex 
+            flex-wrap       
+            lg:flex-nowrap  
+            justify-center  
+            items-center    
+            gap-3 md:gap-6
+          "
         >
           {SCROLLS.map((scroll) => (
             <ScrollCard
@@ -85,7 +87,8 @@ export default function Home() {
           ))}
         </div>
       </section>
-      {/* 3. RODAPÉ (AQUI ESTÁ ELE!) */}
+
+      {/* 3. RODAPÉ */}
       <Footer />
     </div>
   );
