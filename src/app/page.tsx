@@ -10,7 +10,7 @@ const SCROLLS = [
     id: 1,
     src: "/images/banner1.png",
     alt: "A Doutrina dos Mestres",
-    link: "/doutrina",
+    link: "https://pay.kirvano.com/55db13f4-ac4b-42bd-9921-64194fca86b7",
   },
   {
     id: 2,
