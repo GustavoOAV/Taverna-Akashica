@@ -564,6 +564,14 @@ export const BOOKS: Book[] = [
     category: "historia",
     language: "pt",
   },
+   {
+    id: "b71",
+    title: "História da Civilização Olmeca",
+    imageSrc: "https://m.media-amazon.com/images/I/7113UftzubL._SL1500_.jpg",
+    amazonLink: "https://amzn.to/4aIrrck",
+    category: "historia",
+    language: "pt",
+  },
   
   
 ];
